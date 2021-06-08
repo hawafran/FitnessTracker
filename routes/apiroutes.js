@@ -12,23 +12,27 @@ router.get("/api/workouts", (req, res) => {
       res.status(400).json(err);
     });
 });
+
   
 //  add new exersize
-router.put("/api/workouts/:workout", (req, res) => {
-
-    db.Workout.findOneAndUpdate(
-        { _id: req.params.id },
-        {
-            $inc: { totalDuration: req.body.duration },
-            $push: { exercises: req.body }
+router.put("/api/workouts/:id", async (req, res) => {
+    const id = req.params.id;
+    const body = req.body;
+    db.Workout.updateOne(
+      { _id: id },
+      {
+        $push: {
+          exercises: { ...body },
         },
-        { new: true }).then(dbWorkout => {
-            res.json(dbWorkout);
-        }).catch(err => {
-            res.json(err);
-     });
-
-});
+      }
+    )
+      .then((workout) => {
+        res.status(200).json(workout);
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  });
 
 // new workout
 router.post("/api/workouts", ({ body }, res) => {
